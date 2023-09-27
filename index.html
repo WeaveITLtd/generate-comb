@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random COMB</title>
+    <style>
+        html,
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="uuid" style="text-align: center;">Generating..</h1>
+    <script>
+        function genComb() {
+            const rndBytes = new Uint8Array(10);
+            window.crypto.getRandomValues(rndBytes);
+            rndBytes[0] = 0x40 | (rndBytes[0] & 0x0F);
+            rndBytes[1] = 0x80 | (rndBytes[1] & 0x3F)
+
+            const now = BigInt(Date.now());
+            const timeBytes = new Uint8Array(6);
+            for (let i = 0; i < 6; i++) {
+                timeBytes[5 - i] = Number(now >> BigInt(i * 8)) & 0xff;
+            }
+            const mapped = [...timeBytes, ...rndBytes].map((i) => ('0' + i.toString(16)).slice(-2));
+            return mapped.join("").replace(/^([0-9a-f]{8})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{4})([0-9a-f]{12})$/, "$1-$2-$3-$4-$5");
+        }
+
+        function setContent(text) {
+            document.getElementById("uuid").textContent = text;
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            setContent(genComb());
+        });
+    </script>
+</body>
+
+</html>
